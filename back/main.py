@@ -11,8 +11,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Зависимость для БД
@@ -22,7 +24,9 @@ def get_db():
         yield db
     finally:
         db.close()
-
+@app.options("/auth/user")
+async def options_auth():
+    return {"message": "OK"}
 
 @app.post("/auth/user", response_model=schemas.UserResponse)
 def handle_user(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
